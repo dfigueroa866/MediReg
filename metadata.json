@@ -1,0 +1,7 @@
+{
+  "name": "Clínica Vital & MediReg Platform",
+  "description": "Una plataforma integral de gestión médica que permite agendar citas y registrar clínicas con una interfaz moderna y profesional.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
