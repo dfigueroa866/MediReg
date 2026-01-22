@@ -23,6 +23,14 @@ const Hero: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+
+    // Validation: Phone must be numbers only
+    if (name === 'phone') {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setFormData(prev => ({ ...prev, [name]: numericValue }));
+      return;
+    }
+
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -171,6 +179,8 @@ const Hero: React.FC = () => {
                         onChange={handleChange}
                         className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
                         placeholder="+52 55..."
+                        pattern="[0-9]*"
+                        title="Solo se permiten números"
                         required
                       />
                     </div>
@@ -213,6 +223,7 @@ const Hero: React.FC = () => {
                     rows={3}
                     className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm"
                     placeholder="Describe brevemente el motivo de tu consulta..."
+                    required
                   ></textarea>
                 </div>
 
