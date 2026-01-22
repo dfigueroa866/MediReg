@@ -1,15 +1,64 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { sendRegistrationData, RegistrationData } from '../services/webhookService';
 
 const Hero: React.FC = () => {
+  // Helper to get initial state with all required fields
+  const getInitialState = (): RegistrationData => ({
+    lead_id: '',
+    created_at: '',
+    source: '',
+    status: '',
+    fullName: '',
+    clinicName: '',
+    phone: '',
+    email: '',
+    role: 'Paciente',
+    budget: 'Consulta General',
+    details: ''
+  });
+
+  const [formData, setFormData] = useState<RegistrationData>(getInitialState());
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      // Prepare data with generated hidden fields
+      const dataToSend: RegistrationData = {
+        ...formData,
+        lead_id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        source: 'web page',
+        status: 'pending_call'
+      };
+
+      await sendRegistrationData(dataToSend);
+      alert('Cita agendada con éxito!');
+      setFormData(getInitialState());
+    } catch (error: any) {
+      console.error(error);
+      alert(`Error: ${error.message || 'Hubo un error al agendar la cita'}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20">
       {/* Background decoration */}
       <div className="absolute inset-0 -z-10 h-full w-full bg-bg-light bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
-      
+
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-12 gap-12 items-start">
-          
+
           {/* Left: Value Proposition */}
           <div className="lg:col-span-7 pt-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 mb-6">
@@ -22,7 +71,7 @@ const Hero: React.FC = () => {
             <p className="text-lg text-text-secondary mb-10 max-w-2xl leading-relaxed">
               Optimiza tu tiempo y gestiona tu salud de manera eficiente. Conecta con los mejores profesionales, recibe recordatorios automáticos y mantén tu historial seguro en un solo lugar.
             </p>
-            
+
             <div className="grid sm:grid-cols-2 gap-8 mb-12">
               <div className="flex gap-4">
                 <div className="flex-shrink-0 size-12 rounded-xl bg-green-100 flex items-center justify-center text-green-600">
@@ -61,12 +110,37 @@ const Hero: React.FC = () => {
                 <h2 className="text-lg font-bold text-text-main">Reserva tu espacio</h2>
                 <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">En línea</span>
               </div>
-              <form className="p-6 md:p-8 space-y-5" onSubmit={(e) => e.preventDefault()}>
+              <form className="p-6 md:p-8 space-y-5" onSubmit={handleSubmit}>
                 <div>
                   <label className="block text-sm font-medium text-text-main mb-1.5">Nombre completo</label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">person</span>
-                    <input type="text" className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5" placeholder="Ej. Juan Pérez" />
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
+                      placeholder="Ej. Juan Pérez"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Email Field Added Here */}
+                <div>
+                  <label className="block text-sm font-medium text-text-main mb-1.5">Email</label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">mail</span>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
+                      placeholder="ejemplo@correo.com"
+                      required
+                    />
                   </div>
                 </div>
 
@@ -75,14 +149,30 @@ const Hero: React.FC = () => {
                     <label className="block text-sm font-medium text-text-main mb-1.5">Clínica</label>
                     <div className="relative">
                       <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">apartment</span>
-                      <input type="text" className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5" placeholder="Ej. Central" />
+                      <input
+                        type="text"
+                        name="clinicName"
+                        value={formData.clinicName}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
+                        placeholder="Ej. Central"
+                        required
+                      />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-text-main mb-1.5">Teléfono</label>
                     <div className="relative">
                       <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">phone</span>
-                      <input type="tel" className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5" placeholder="+52 55..." />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
+                        placeholder="+52 55..."
+                        required
+                      />
                     </div>
                   </div>
                 </div>
@@ -90,14 +180,24 @@ const Hero: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-text-main mb-1.5">Rol</label>
-                    <select className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm py-2.5">
+                    <select
+                      name="role"
+                      value={formData.role}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm py-2.5"
+                    >
                       <option>Paciente</option>
                       <option>Especialista</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-text-main mb-1.5">Presupuesto</label>
-                    <select className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm py-2.5">
+                    <select
+                      name="budget"
+                      value={formData.budget}
+                      onChange={handleChange}
+                      className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm py-2.5"
+                    >
                       <option>Consulta General</option>
                       <option>Especialidad</option>
                     </select>
@@ -106,14 +206,25 @@ const Hero: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-text-main mb-1.5">Detalles adicionales</label>
-                  <textarea rows={3} className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm" placeholder="Describe brevemente el motivo de tu consulta..."></textarea>
+                  <textarea
+                    name="details"
+                    value={formData.details}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm"
+                    placeholder="Describe brevemente el motivo de tu consulta..."
+                  ></textarea>
                 </div>
 
-                <button type="submit" className="w-full flex items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all active:scale-[0.98] group">
-                  Agendar Cita
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all active:scale-[0.98] group disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Enviando...' : 'Agendar Cita'}
                   <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform text-lg">arrow_forward</span>
                 </button>
-                
+
                 <p className="text-[11px] text-center text-text-secondary">
                   Al hacer clic en "Agendar Cita", aceptas nuestros <a href="#" className="underline">Términos</a> y <a href="#" className="underline">Política de Privacidad</a>.
                 </p>
@@ -127,3 +238,4 @@ const Hero: React.FC = () => {
 };
 
 export default Hero;
+
