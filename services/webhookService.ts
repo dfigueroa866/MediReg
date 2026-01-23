@@ -12,7 +12,7 @@ export interface RegistrationData {
   details: string;
 }
 
-const WEBHOOK_URL = 'https://nonethically-interactive-miguel.ngrok-free.dev/webhook/ded35b63-86a6-4518-bbfc-061e0eb82508'; // Proxied via Vite
+const WEBHOOK_URL = 'https://n8n.apps-m8solutions.com/webhook/ded35b63-86a6-4518-bbfc-061e0eb82508'; // Proxied via Vite
 
 export const sendRegistrationData = async (data: RegistrationData): Promise<void> => {
   try {

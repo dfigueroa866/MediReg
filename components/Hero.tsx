@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { sendRegistrationData, RegistrationData } from '../services/webhookService';
 
+// ... imports
 const Hero: React.FC = () => {
-  // Helper to get initial state with all required fields
+  // ... initial state helper
   const getInitialState = (): RegistrationData => ({
     lead_id: '',
     created_at: '',
@@ -20,6 +21,7 @@ const Hero: React.FC = () => {
 
   const [formData, setFormData] = useState<RegistrationData>(getInitialState());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false); // New state for success message
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -49,7 +51,7 @@ const Hero: React.FC = () => {
       };
 
       await sendRegistrationData(dataToSend);
-      alert('Cita agendada con éxito!');
+      setShowSuccess(true); // Show success message instead of alert
       setFormData(getInitialState());
     } catch (error: any) {
       console.error(error);
@@ -118,128 +120,150 @@ const Hero: React.FC = () => {
                 <h2 className="text-lg font-bold text-text-main">Reserva tu espacio</h2>
                 <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">En línea</span>
               </div>
-              <form className="p-6 md:p-8 space-y-5" onSubmit={handleSubmit}>
-                <div>
-                  <label className="block text-sm font-medium text-text-main mb-1.5">Nombre completo</label>
-                  <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">person</span>
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
-                      placeholder="Ej. Juan Pérez"
-                      required
-                    />
-                  </div>
-                </div>
 
-                {/* Email Field Added Here */}
-                <div>
-                  <label className="block text-sm font-medium text-text-main mb-1.5">Email</label>
-                  <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">mail</span>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
-                      placeholder="ejemplo@correo.com"
-                      required
-                    />
+              {showSuccess ? (
+                <div className="p-8 flex flex-col items-center justify-center text-center space-y-6 h-[600px]">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                    <span className="material-symbols-outlined text-5xl text-green-600">check_circle</span>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-text-main mb-1.5">Clínica</label>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">¡Solicitud Recibida!</h3>
+                    <p className="text-gray-600 text-lg">
+                      Hemos recibido tus datos con éxito. Nuestro equipo se pondrá en contacto contigo a la brevedad para confirmar tu cita.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowSuccess(false)}
+                    className="mt-6 px-8 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-300 shadow-md"
+                  >
+                    Hacer otra reserva
+                  </button>
+                </div>
+              ) : (
+                <form className="p-6 md:p-8 space-y-5" onSubmit={handleSubmit}>
+                  {/* ... form content ... */}
+                  <div>
+                    <label className="block text-sm font-medium text-text-main mb-1.5">Nombre completo</label>
                     <div className="relative">
-                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">apartment</span>
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">person</span>
                       <input
                         type="text"
-                        name="clinicName"
-                        value={formData.clinicName}
+                        name="fullName"
+                        value={formData.fullName}
                         onChange={handleChange}
                         className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
-                        placeholder="Ej. Central"
+                        placeholder="Ej. Juan Pérez"
                         required
                       />
                     </div>
                   </div>
+
+                  {/* Email Field */}
                   <div>
-                    <label className="block text-sm font-medium text-text-main mb-1.5">Teléfono</label>
+                    <label className="block text-sm font-medium text-text-main mb-1.5">Email</label>
                     <div className="relative">
-                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">phone</span>
+                      <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">mail</span>
                       <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
+                        type="email"
+                        name="email"
+                        value={formData.email}
                         onChange={handleChange}
                         className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
-                        placeholder="+52 55..."
-                        pattern="[0-9]*"
-                        title="Solo se permiten números"
+                        placeholder="ejemplo@correo.com"
                         required
                       />
                     </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text-main mb-1.5">Rol</label>
-                    <select
-                      name="role"
-                      value={formData.role}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm py-2.5"
-                    >
-                      <option>Paciente</option>
-                      <option>Especialista</option>
-                    </select>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-text-main mb-1.5">Clínica</label>
+                      <div className="relative">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">apartment</span>
+                        <input
+                          type="text"
+                          name="clinicName"
+                          value={formData.clinicName}
+                          onChange={handleChange}
+                          className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
+                          placeholder="Ej. Central"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-main mb-1.5">Teléfono</label>
+                      <div className="relative">
+                        <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl">phone</span>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          className="w-full rounded-lg border-gray-300 pl-10 focus:ring-primary focus:border-primary text-sm py-2.5"
+                          placeholder="+52 55..."
+                          pattern="[0-9]*"
+                          title="Solo se permiten números"
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text-main mb-1.5">Presupuesto</label>
-                    <select
-                      name="budget"
-                      value={formData.budget}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm py-2.5"
-                    >
-                      <option>Consulta General</option>
-                      <option>Especialidad</option>
-                    </select>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-text-main mb-1.5">Rol</label>
+                      <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm py-2.5"
+                      >
+                        <option>Paciente</option>
+                        <option>Especialista</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-text-main mb-1.5">Presupuesto</label>
+                      <select
+                        name="budget"
+                        value={formData.budget}
+                        onChange={handleChange}
+                        className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm py-2.5"
+                      >
+                        <option>Consulta General</option>
+                        <option>Especialidad</option>
+                      </select>
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-text-main mb-1.5">Detalles adicionales</label>
-                  <textarea
-                    name="details"
-                    value={formData.details}
-                    onChange={handleChange}
-                    rows={3}
-                    className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm"
-                    placeholder="Describe brevemente el motivo de tu consulta..."
-                    required
-                  ></textarea>
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-main mb-1.5">Detalles adicionales</label>
+                    <textarea
+                      name="details"
+                      value={formData.details}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full rounded-lg border-gray-300 focus:ring-primary focus:border-primary text-sm"
+                      placeholder="Describe brevemente el motivo de tu consulta..."
+                      required
+                    ></textarea>
+                  </div>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all active:scale-[0.98] group disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? 'Enviando...' : 'Agendar Cita'}
-                  <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform text-lg">arrow_forward</span>
-                </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full flex items-center justify-center gap-2 rounded-lg bg-primary py-3.5 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all active:scale-[0.98] group disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Enviando...' : 'Agendar Cita'}
+                    <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform text-lg">arrow_forward</span>
+                  </button>
 
-                <p className="text-[11px] text-center text-text-secondary">
-                  Al hacer clic en "Agendar Cita", aceptas nuestros <a href="#" className="underline">Términos</a> y <a href="#" className="underline">Política de Privacidad</a>.
-                </p>
-              </form>
+                  <p className="text-[11px] text-center text-text-secondary">
+                    Al hacer clic en "Agendar Cita", aceptas nuestros <a href="#" className="underline">Términos</a> y <a href="#" className="underline">Política de Privacidad</a>.
+                  </p>
+                </form>
+              )}
             </div>
           </div>
         </div>

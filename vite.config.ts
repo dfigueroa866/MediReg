@@ -7,6 +7,9 @@ export default defineConfig(({ mode }) => {
   return {
     server: {
       port: 3000,
+      allowedHosts: [
+        'medireg.netlify.app',
+      ],
       host: '0.0.0.0',
       proxy: {
         '^/webhook(-test)?/.*': {
